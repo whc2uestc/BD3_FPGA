@@ -1,27 +1,34 @@
 /*
  * the acq of b1 data channel.
  */
-module BOC_ACQ(rx_clk,rx_rst,rx_src,
-				tx_acq_suc,tx_acq_phs);
+module BOC_ACQ(rx_clk,rx_rst,rx_src,rx_car_fcw,
+				tx_src_real,tx_src_imag,tx_acq_suc,tx_acq_phs);
 
 parameter ACC_WIDTH = 32;
 parameter CORR_WIDTH = 32;
 parameter PRN_PHS_WIDTH = 12;
 input[7:0] rx_src;
 input rx_clk,rx_rst;
+output[15:0] tx_src_real;
+output[15:0] tx_src_imag;
+output[ACC_WIDTH-1:0] rx_car_fcw;
 output tx_acq_suc;
 output[PRN_PHS_WIDTH-1:0] tx_acq_phs;
 
-CAR_GEN BOC_CAR_GEN(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_car_fcw(),
+
+wire[15:0] car_cos,car_sin;
+assign tx_src_real = car_cos;
+assign tx_src_imag = car_sin;
+CAR_GEN BOC_CAR_GEN(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_car_fcw(rx_car_fcw),
 					.tx_car_cos(car_cos),.tx_car_sin(car_sin));	
 				
-BOC_PRN_GEN BOC_PRN_GEN(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({ACC_WIDTH{1'b0}}),
+BOC_PRN_GEN BOC_PRN_GEN_U1(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({ACC_WIDTH{1'b0}}),
 						.tx_loc_boc(loc_boc_1),.tx_loc_prn(),.tx_prn_sop(prn_sop_1),.tx_prn_eop(prn_eop_1));
-BOC_PRN_GEN BOC_PRN_GEN(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({2'b01,{{ACC_WIDTH-2}{1'b0}}}),
+BOC_PRN_GEN BOC_PRN_GEN_U2(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({2'b01,{{ACC_WIDTH-2}{1'b0}}}),
 						.tx_loc_boc(loc_boc_2),.tx_loc_prn(),.tx_prn_sop(prn_sop_2),.tx_prn_eop(prn_eop_2));
-BOC_PRN_GEN BOC_PRN_GEN(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({2'b10,{{ACC_WIDTH-2}{1'b0}}}),
+BOC_PRN_GEN BOC_PRN_GEN_U3(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({2'b10,{{ACC_WIDTH-2}{1'b0}}}),
 						.tx_loc_boc(loc_boc_3),.tx_loc_prn(),.tx_prn_sop(prn_sop_3),.tx_prn_eop(prn_eop_3));	
-BOC_PRN_GEN BOC_PRN_GEN(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({2'b11,{{ACC_WIDTH-2}{1'b0}}}),
+BOC_PRN_GEN BOC_PRN_GEN_U4(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({2'b11,{{ACC_WIDTH-2}{1'b0}}}),
 						.tx_loc_boc(loc_boc_4),.tx_loc_prn(),.tx_prn_sop(prn_sop_4),.tx_prn_eop(prn_eop_4));							
 
 LPM_MULT8_CORE multiI(	.dataa(car_cos),	.datab(rx_src),	.result(data_real));
