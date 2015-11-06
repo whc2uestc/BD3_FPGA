@@ -17,7 +17,7 @@ always @(posedge rx_clk) begin
 end
 
 // µ÷ÓÃROM IP Core 
-CAR_ROM CAR_COS();
-CAR_ROM CAR_SIN();
+CAR_COS_ROM CAR_I(	.address(phs_acc_reg[31:24]),	.clock(clk),	.q(tx_car_cos));
+CAR_COS_ROM CAR_Q(	.address(phs_acc_reg[31:24]+8'd192),	.clock(clk),	.q(tx_car_sin));
 
 endmodule
