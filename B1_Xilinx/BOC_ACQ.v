@@ -1,8 +1,9 @@
 /*
  * the acq of b1 data channel.
  */
-module BOC_ACQ(rx_clk,rx_rst,rx_src,rx_car_fcw,
-				tx_src_real,tx_src_imag,tx_acq_suc,tx_acq_phs);
+module BOC_ACQ(rx_clk,rx_rst,rx_src,rx_car_fcw,rx_prn_fcw,
+				tx_src_real,tx_src_imag,tx_prn_sop,tx_trk_rst,
+				tx_loc_bocE,tx_loc_bocP,tx_loc_bocL,tx_prn_sop);
 
 parameter ACC_WIDTH = 32;
 parameter CORR_WIDTH = 32;
@@ -11,24 +12,75 @@ input[7:0] rx_src;
 input rx_clk,rx_rst;
 output[15:0] tx_src_real;
 output[15:0] tx_src_imag;
-output[ACC_WIDTH-1:0] rx_car_fcw;
-output tx_acq_suc;
-output[PRN_PHS_WIDTH-1:0] tx_acq_phs;
+output[ACC_WIDTH-1:0] rx_car_fcw,rx_prn_fcw;
+
+output tx_loc_bocE,tx_loc_bocP,tx_loc_bocL;
+output tx_prn_sop;
+output tx_trk_rst;
+
+assign tx_trk_rst = rx_rst | (acq_flag ^ acq_suc);
+
+assign car_fcw = acq_suc?(32'd1342177280 - rx_car_fcw):32'd1342177280;
+assign prn_fcw = acq_suc?(rx_prn_fcw+32'd274609472):32'd274609472;
+
+reg trk_rst;
+reg prn_gen_rst;
+reg acq_suc;
+always @(posedge rx_clk) begin
+	if(rx_rst) begin
+		tx_trk_rst <= 1'b1;
+		acq_suc <= 1'b0;
+	end
+	else begin
+		if(acq_flag && !acq_suc) begin 
+			if(prn_phs == acq_phs) begin
+				prn_gen_rst <= 1'b1;
+				acq_suc <= 1'b1;
+			end
+			else
+				prn_gen_rst <= 1'b0;
+		end
+		else
+			prn_gen_rst <= 1'b0;
+	end
+end
+
+wire[PRN_PHS_WIDTH-1:0] prn_phs;
+BOC_PRN_GEN BOC_PRN_GEN_TRK(.rx_clk(rx_clk),.rx_rst(prn_gen_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b0),.rx_init_phs({ACC_WIDTH{1'b0}}),
+						.tx_loc_boc(tx_loc_bocE),.tx_loc_prn(),.tx_prn_sop(tx_prn_sop),.tx_prn_eop(prn_eop),.tx_prn_phs(prn_phs));
+
+reg prn_phs_delay;
+reg tx_loc_bocE,tx_loc_bocP,tx_loc_bocL;
+always @(posedge rx_clk) begin
+	if(rx_rst) begin
+		tx_loc_bocE <= 1'b0;
+		tx_loc_bocP <= 1'b0;
+		tx_loc_bocL <= 1'b0;
+		prn_phs_delay <= 1'b0;
+	end
+	else begin
+		if(prn_phs_delay ^ prn_phs[0]) begin
+			tx_loc_bocL <= tx_loc_bocP;
+			tx_loc_bocP <= tx_loc_bocE;
+		end		
+		prn_phs_delay <= prn_phs[0];
+	end
+end
 
 
 wire[15:0] car_cos,car_sin;
 assign tx_src_real = car_cos;
 assign tx_src_imag = car_sin;
-CAR_GEN BOC_CAR_GEN(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_car_fcw(rx_car_fcw),
+CAR_GEN BOC_CAR_GEN(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_car_fcw(car_fcw),
 					.tx_car_cos(car_cos),.tx_car_sin(car_sin));	
 				
-BOC_PRN_GEN BOC_PRN_GEN_U1(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({ACC_WIDTH{1'b0}}),
+BOC_PRN_GEN BOC_PRN_GEN_U1(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b100),.rx_init_phs({ACC_WIDTH{1'b0}}),.rx_paral_index(2'b0),
 						.tx_loc_boc(loc_boc_1),.tx_loc_prn(),.tx_prn_sop(prn_sop_1),.tx_prn_eop(prn_eop_1));
-BOC_PRN_GEN BOC_PRN_GEN_U2(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({2'b01,{{ACC_WIDTH-2}{1'b0}}}),
+BOC_PRN_GEN BOC_PRN_GEN_U2(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b100),.rx_init_phs({2'b01,{{ACC_WIDTH-2}{1'b0}}}),.rx_paral_index(2'b1),
 						.tx_loc_boc(loc_boc_2),.tx_loc_prn(),.tx_prn_sop(prn_sop_2),.tx_prn_eop(prn_eop_2));
-BOC_PRN_GEN BOC_PRN_GEN_U3(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({2'b10,{{ACC_WIDTH-2}{1'b0}}}),
+BOC_PRN_GEN BOC_PRN_GEN_U3(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b100),.rx_init_phs({2'b10,{{ACC_WIDTH-2}{1'b0}}}),.rx_paral_index(2'b2),
 						.tx_loc_boc(loc_boc_3),.tx_loc_prn(),.tx_prn_sop(prn_sop_3),.tx_prn_eop(prn_eop_3));	
-BOC_PRN_GEN BOC_PRN_GEN_U4(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(),.rx_corr_paral(3'b100),.rx_init_phs({2'b11,{{ACC_WIDTH-2}{1'b0}}}),
+BOC_PRN_GEN BOC_PRN_GEN_U4(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b100),.rx_init_phs({2'b11,{{ACC_WIDTH-2}{1'b0}}}),.rx_paral_index(2'b3),
 						.tx_loc_boc(loc_boc_4),.tx_loc_prn(),.tx_prn_sop(prn_sop_4),.tx_prn_eop(prn_eop_4));							
 
 LPM_MULT8_CORE multiI(	.dataa(car_cos),	.datab(rx_src),	.result(data_real));
@@ -90,17 +142,17 @@ always @(posedge rx_clk) begin
 	end
 end
 
-reg tx_acq_suc;
-reg[PRN_PHS_WIDTH-1:0] tx_acq_phs;
+reg acq_flag;
+reg[PRN_PHS_WIDTH-1:0] acq_phs;
 always @(posedge rx_clk) begin
 	if(rx_rst) begin
-		tx_acq_suc <= 1'b0;
-		tx_acq_phs <= {PRN_PHS_WIDTH{1'b0}};
+		acq_flag <= 1'b0;
+		acq_phs <= {PRN_PHS_WIDTH{1'b0}};
 	end
 	else begin
 		if(corr_phs_4==12'd4092) begin
-			tx_acq_suc <= 1'b1;
-			tx_acq_phs <= acq_prn_phs;
+			acq_flag <= 1'b1;
+			acq_phs <= acq_prn_phs;
 		end
 	end
 end
