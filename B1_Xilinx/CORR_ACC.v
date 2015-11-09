@@ -1,3 +1,23 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date:    14:11:47 11/07/2015 
+// Design Name: 	whc
+// Module Name:    CORR_ACC
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
 module CORR_ACC(rx_clk,rx_rst,rx_data_real,rx_data_imag,rx_loc_boc,rx_prn_sop,rx_prn_eop,
 				tx_corr_acc);
 
