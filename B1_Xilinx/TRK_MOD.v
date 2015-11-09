@@ -112,10 +112,10 @@ wire[47:0] pow_bbE_real;
 wire[47:0] pow_bbL_real;
 wire[47:0] pow_bbE_imag;
 wire[47:0] pow_bbL_imag;
-LPM_POW2_CORE POW2_bbE_Real(	.dataa(acc_bbE_real),	.result(pow_bbE_real));
-LPM_POW2_CORE POW2_bbL_Real(	.dataa(acc_bbL_real),	.result(pow_bbL_real));
-LPM_POW2_CORE POW2_bbE_Imag(	.dataa(acc_bbE_imag),	.result(pow_bbE_imag));
-LPM_POW2_CORE POW2_bbL_Imag(	.dataa(acc_bbL_imag),	.result(pow_bbL_imag));
+LPM_POW2_CORE POW2_bbE_Real(	.a(acc_bbE_real), .b(acc_bbE_real),	.p(pow_bbE_real));
+LPM_POW2_CORE POW2_bbL_Real(	.a(acc_bbL_real), .b(acc_bbL_real),	.p(pow_bbL_real));
+LPM_POW2_CORE POW2_bbE_Imag(	.a(acc_bbE_imag),	.b(acc_bbE_imag), .p(pow_bbE_imag));
+LPM_POW2_CORE POW2_bbL_Imag(	.a(acc_bbL_imag),	.b(acc_bbL_imag), .p(pow_bbL_imag));
 
 //wire[49:0] dll_denom;
 //wire[48:0] dll_numer;
