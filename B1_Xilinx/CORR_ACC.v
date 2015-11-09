@@ -8,20 +8,18 @@ parameter DAT_WIDTH = 16;
 input rx_clk,rx_rst;
 input[DAT_WIDTH-1:0] rx_data_real,rx_data_imag;
 input rx_loc_boc; 
-
+input rx_prn_sop,rx_prn_eop;
 output wire[CORR_ACC_WIDTH-1:0] tx_corr_acc;
 
-assign tx_corr_acc = pow_real + pow_imag;
+
 
 reg[CORR_WIDTH-1:0] corr_acc_real;
 reg[CORR_WIDTH-1:0] corr_acc_imag;
 
 always @(posedge rx_clk) begin 
 	if(rx_rst) begin
-		corr_peak <= CORR_WIDTH'b0;
 		corr_acc_real <= {CORR_WIDTH{1'b0}};
 		corr_acc_imag <= {CORR_WIDTH{1'b0}};
-		acq_prn_phs <= PRN_PHS_WIDTH'b0;
 	end
 	else begin
 		if(rx_prn_sop) begin
@@ -61,7 +59,9 @@ always @(posedge rx_clk) begin
 end
 
 wire[CORR_ACC_WIDTH-1:0] pow_real,pow_imag;
-LPM_POW2_CORE POW2_U1(	.dataa(corr_acc_real),	.result(pow_real));
-LPM_POW2_CORE POW2_U2(	.dataa(corr_acc_imag),	.result(pow_imag));
+LPM_POW2_CORE POW2_U1(	.a(corr_acc_real),	.b(corr_acc_real), .p(pow_real));
+LPM_POW2_CORE POW2_U2(	.a(corr_acc_imag),	.b(corr_acc_imag), .p(pow_imag));
+
+assign tx_corr_acc = pow_real + pow_imag;
 
 endmodule
