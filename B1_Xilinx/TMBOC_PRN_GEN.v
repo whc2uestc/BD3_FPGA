@@ -6,16 +6,19 @@ input rx_clk,rx_rst;
 input[ACC_WIDTH-1:0] rx_prn_fcw;
 input[ACC_WIDTH-1:0] rx_init_phs;
 input[2:0] rx_corr_paral;
-output tx_loc_boc,tx_loc_prn;
+input[1:0] rx_paral_index;
+output tx_loc_tmboc,tx_loc_prn;
 output tx_prn_sop,tx_prn_eop;
 output wire[PRN_PHS_WIDTH-1:0] tx_prn_phs;
 
+reg[PRN_PHS_WIDTH-1:0] prn_phs;
+reg[ACC_WIDTH-1:0] phs_acc_reg;
 assign tx_prn_phs = prn_phs[PRN_PHS_WIDTH-2:0];
 assign tx_loc_tmboc = tx_loc_prn ^ phs_acc_reg[30];
 
-reg[ACC_WIDTH-1:0] phs_acc_reg;
+
 reg phs_acc_reg_delay;
-reg[PRN_PHS_WIDTH-1:0] prn_phs;
+
 reg tx_prn_sop,tx_prn_eop;
 always @(posedge rx_clk) begin
 	if(rx_rst) begin
@@ -49,6 +52,6 @@ end
 
 
 // µ÷ÓÃROM IP Core 
-TMBOC_PRN_ACQ_ROM TMBOC_PRN_ACQ(	.address(phs_acc_reg[31:18]),	.clock(rx_clk),	.q(tx_loc_prn));
+TMBOC_PRN_ACQ_ROM TMBOC_PRN_ACQ(	.A(phs_acc_reg[31:18]),	.SPO(tx_loc_prn));
 
 endmodule
