@@ -1,6 +1,27 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date:    14:11:47 11/07/2015 
+// Design Name: 	whc
+// Module Name:    LPF_TRK
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
 module LPF_TRK(rx_rst,rx_clk,rx_pll_disc,rx_dll_disc,rx_prn_sop,
-					tx_prn_fcw,tx_car_fcw,
-					pll_reg0_delay,pll_reg1_delay,dll_out,pll_out,pll_reg0,pll_reg1,dll_reg,dll_reg_delay);
+			tx_prn_fcw,tx_car_fcw,
+			pll_reg0_delay,pll_reg1_delay,dll_out,pll_out,pll_reg0,
+			pll_reg1,dll_reg,dll_reg_delay);
 
 input rx_rst;
 input rx_clk;
@@ -52,12 +73,6 @@ always @(posedge rx_clk) begin
 	end
 end
 
-//wire[31:0] tx_prn_fcw;
-//wire[31:0] tx_car_fcw;
-
-//assign tx_prn_fcw = dll_out[54:23];
-//assign tx_car_fcw = pll_out[54:23];
-
 reg[31:0] tx_prn_fcw;
 reg[31:0] tx_car_fcw;
 always @(posedge rx_clk) begin
@@ -70,6 +85,5 @@ always @(posedge rx_clk) begin
 		tx_car_fcw <= pll_out[54:23];
 	end
 end
-//assign tx_prn_fcw = dll_out[54:23];
-//assign tx_car_fcw = pll_out[54:23];
+
 endmodule
