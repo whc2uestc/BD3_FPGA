@@ -1,6 +1,23 @@
-/*
- * the acq of b1 pilot channel.
- */
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date:    14:11:47 11/07/2015 
+// Design Name: 	whc
+// Module Name:    TMBOC_ACQ
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
 module TMBOC_ACQ(rx_clk,rx_rst,rx_src,rx_car_fcw,rx_prn_fcw,
 				tx_src_real,tx_src_imag,tx_prn_sop,tx_trk_rst,
 				tx_loc_tmbocE,tx_loc_tmbocP,tx_loc_tmbocL,tx_prn_sop);
