@@ -42,16 +42,27 @@ module TMBOC_PRN_TRK_ROM(
 	SPO);
 
 
+<<<<<<< HEAD
 input [11 : 0] A;
+=======
+input [9 : 0] A;
+>>>>>>> origin/master
 output [0 : 0] SPO;
 
 // synthesis translate_off
 
       C_DIST_MEM_V7_1 #(
+<<<<<<< HEAD
 		.C_ADDR_WIDTH(12),
 		.C_DEFAULT_DATA("0"),
 		.C_DEFAULT_DATA_RADIX(1),
 		.C_DEPTH(4096),
+=======
+		.C_ADDR_WIDTH(10),
+		.C_DEFAULT_DATA("0"),
+		.C_DEFAULT_DATA_RADIX(1),
+		.C_DEPTH(1024),
+>>>>>>> origin/master
 		.C_ENABLE_RLOCS(1),
 		.C_GENERATE_MIF(1),
 		.C_HAS_CLK(0),

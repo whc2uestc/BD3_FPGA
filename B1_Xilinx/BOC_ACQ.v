@@ -1,6 +1,23 @@
-/*
- * the acq of b1 data channel.
- */
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date:    14:11:47 11/07/2015 
+// Design Name: 	whc
+// Module Name:    BOC_ACQ
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
 module BOC_ACQ(rx_clk,rx_rst,rx_src,rx_car_fcw,rx_prn_fcw,
 				tx_src_real,tx_src_imag,tx_prn_sop,tx_trk_rst,
 				tx_loc_bocE,tx_loc_bocP,tx_loc_bocL,
@@ -46,8 +63,22 @@ always @(posedge rx_clk) begin
 end
 
 
+<<<<<<< HEAD
+=======
+reg acq_suc;
+reg acq_flag;
+reg[PRN_PHS_WIDTH-1:0] acq_phs;
+wire[PRN_PHS_WIDTH-1:0] prn_phs;
+assign tx_trk_rst = rx_rst | (acq_flag ^ acq_suc);
+>>>>>>> origin/master
 
 
+<<<<<<< HEAD
+=======
+reg trk_rst;
+reg prn_gen_rst;
+
+>>>>>>> origin/master
 always @(posedge rx_clk) begin
 	if(rx_rst) begin
 		prn_gen_rst <= 1'b1;
@@ -68,6 +99,7 @@ always @(posedge rx_clk) begin
 	end
 end
 
+<<<<<<< HEAD
 wire loc_boc;
 BOC_PRN_GEN BOC_PRN_GEN_TRK(.rx_clk(rx_clk),.rx_rst(prn_gen_rst),.rx_prn_fcw(prn_fcw),
 						.rx_corr_paral(3'b0),.rx_paral_index(2'b00),
@@ -79,6 +111,16 @@ BOC_PRN_GEN BOC_PRN_GEN_TRK(.rx_clk(rx_clk),.rx_rst(prn_gen_rst),.rx_prn_fcw(prn
 always @(posedge rx_clk) begin
 	if(rx_rst | prn_gen_rst) begin
 		tx_loc_bocE <= 1'b0;
+=======
+wire tx_loc_bocE;
+BOC_PRN_GEN BOC_PRN_GEN_TRK(.rx_clk(rx_clk),.rx_rst(prn_gen_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b0),.rx_init_phs({ACC_WIDTH{1'b0}}),
+						.tx_loc_boc(tx_loc_bocE),.tx_loc_prn(),.tx_prn_sop(tx_prn_sop),.tx_prn_eop(prn_eop),.tx_prn_phs(prn_phs));
+
+reg prn_phs_delay;
+reg tx_loc_bocP,tx_loc_bocL;
+always @(posedge rx_clk) begin
+	if(rx_rst) begin
+>>>>>>> origin/master
 		tx_loc_bocP <= 1'b0;
 		tx_loc_bocL <= 1'b0;
 		prn_phs_delay <= 1'b1;
@@ -106,6 +148,20 @@ LPM_MULT8_CORE multiI(	.clk(rx_clk),	.a(car_cos),	.b(rx_src),	.p(data_real));
 LPM_MULT8_CORE multiQ(	.clk(rx_clk),	.a(car_sin),	.b(rx_src),	.p(data_imag));
 				
 				
+<<<<<<< HEAD
+=======
+BOC_PRN_GEN BOC_PRN_GEN_U1(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b100),.rx_init_phs({ACC_WIDTH{1'b0}}),.rx_paral_index(2'b00),
+						.tx_loc_boc(loc_boc_1),.tx_loc_prn(),.tx_prn_sop(prn_sop_1),.tx_prn_eop(prn_eop_1));
+BOC_PRN_GEN BOC_PRN_GEN_U2(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b100),.rx_init_phs({2'b01,{{ACC_WIDTH-2}{1'b0}}}),.rx_paral_index(2'b01),
+						.tx_loc_boc(loc_boc_2),.tx_loc_prn(),.tx_prn_sop(prn_sop_2),.tx_prn_eop(prn_eop_2));
+BOC_PRN_GEN BOC_PRN_GEN_U3(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b100),.rx_init_phs({2'b10,{{ACC_WIDTH-2}{1'b0}}}),.rx_paral_index(2'b10),
+						.tx_loc_boc(loc_boc_3),.tx_loc_prn(),.tx_prn_sop(prn_sop_3),.tx_prn_eop(prn_eop_3));	
+BOC_PRN_GEN BOC_PRN_GEN_U4(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_prn_fcw(prn_fcw),.rx_corr_paral(3'b100),.rx_init_phs({2'b11,{{ACC_WIDTH-2}{1'b0}}}),.rx_paral_index(2'b11),
+						.tx_loc_boc(loc_boc_4),.tx_loc_prn(),.tx_prn_sop(prn_sop_4),.tx_prn_eop(prn_eop_4));							
+
+LPM_MULT8_CORE multiI(	.a(car_cos),	.b(rx_src),	.p(data_real));
+LPM_MULT8_CORE multiQ(	.a(car_sin),	.b(rx_src),	.p(data_imag));
+>>>>>>> origin/master
 
 wire loc_boc_1,loc_boc_2,loc_boc_3,loc_boc_4;
 wire prn_sop_1,prn_sop_2,prn_sop_3,prn_sop_4;
@@ -190,6 +246,7 @@ CORR_ACC BOC_CORR_U4(.rx_clk(rx_clk),.rx_rst(rx_rst),.rx_data_real(data_real),.r
 (*keep="yes"*) reg[PRN_PHS_WIDTH-1:0] corr_phs_4_delay;
 always @(posedge rx_clk) begin
 	if(rx_rst) begin
+<<<<<<< HEAD
 		corr_peak_1 <= 48'b0;
 		corr_peak_2 <= 48'b0;
 		corr_peak_3 <= 48'b0;
@@ -206,6 +263,20 @@ always @(posedge rx_clk) begin
 			if(corr_acc_1 > corr_peak_1) begin
 				corr_peak_1 <= corr_acc_1;
 				acq_prn_phs_1 <= corr_phs_1;
+=======
+		corr_peak <= {CORR_WIDTH{1'b0}};
+		acq_prn_phs <= {PRN_PHS_WIDTH{1'b0}};
+		corr_phs_1 <= {{{PRN_PHS_WIDTH-2}{1'b0}},2'b00};
+		corr_phs_2 <= {{{PRN_PHS_WIDTH-2}{1'b0}},2'b01};
+		corr_phs_3 <= {{{PRN_PHS_WIDTH-2}{1'b0}},2'b10};
+		corr_phs_4 <= {{{PRN_PHS_WIDTH-2}{1'b0}},2'b11};
+	end
+	else if(!acq_suc) begin
+		if(prn_eop_1) begin
+			if(corr_acc_1 > corr_peak) begin
+				corr_peak <= corr_acc_1;
+				acq_prn_phs <= corr_phs_1;
+>>>>>>> origin/master
 			end
 		end
 		
@@ -273,6 +344,10 @@ always @(posedge rx_clk) begin
 	end
 end
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 always @(posedge rx_clk) begin
 	if(rx_rst) begin
 		acq_flag <= 1'b0;

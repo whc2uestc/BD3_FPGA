@@ -11,6 +11,7 @@ output tx_prn_sop,tx_prn_eop;
 output wire[11:0] tx_prn_phs;
 output[31:0] tx_phs_acc_reg;
 
+<<<<<<< HEAD
 (*keep="yes"*) reg[11:0] prn_phs;
 (*keep="yes"*) reg[11:0] prn_phs_delay;
 (*keep="yes"*) reg[32:0] phs_acc_reg;
@@ -25,6 +26,17 @@ assign tx_phs_acc_reg = phs_acc_reg[31:0];
 (*keep="yes"*) reg phs_acc_reg_delay;
 (*keep="yes"*) reg tx_prn_sop,tx_prn_eop;
 (*keep="yes"*) reg[7:0] sub_phs;
+=======
+reg[PRN_PHS_WIDTH-1:0] prn_phs;
+reg[ACC_WIDTH-1:0] phs_acc_reg;
+assign tx_prn_phs = prn_phs[PRN_PHS_WIDTH-2:0];
+assign tx_loc_tmboc = tx_loc_prn ^ phs_acc_reg[31];
+
+
+reg phs_acc_reg_delay;
+
+reg tx_prn_sop,tx_prn_eop;
+>>>>>>> origin/master
 always @(posedge rx_clk) begin
 	if(rx_rst) begin
 		phs_acc_reg <= 33'b0;
@@ -89,10 +101,14 @@ end
 //end
 //wire loc_prn;
 // µ÷ÓÃROM IP Core 
+<<<<<<< HEAD
 TMBOC_PRN_TRK_ROM TMBOC_PRN_TRK(	.A(prn_phs),	.SPO(tx_loc_prn));
 
 //always @(posedge rx_clk) begin
 //	tx_loc_prn <= loc_prn;
 //end
+=======
+TMBOC_PRN_TRK_ROM TMBOC_PRN_TRK(	.A(phs_acc_reg[31:20]),	.SPO(tx_loc_prn));
+>>>>>>> origin/master
 
 endmodule

@@ -30,7 +30,19 @@ assign tx_phs_acc_reg = phs_acc_reg[31:0];
 (*keep="yes"*) reg tx_prn_sop,tx_prn_eop;
 
 
+<<<<<<< HEAD
 
+=======
+reg[PRN_PHS_WIDTH-1:0] prn_phs;
+reg[ACC_WIDTH-1:0] phs_acc_reg;
+assign tx_prn_phs = prn_phs[PRN_PHS_WIDTH-2:0];
+assign tx_loc_boc = tx_loc_prn ^ phs_acc_reg[31];
+
+
+reg phs_acc_reg_delay;
+
+reg tx_prn_sop,tx_prn_eop;
+>>>>>>> origin/master
 always @(posedge rx_clk) begin
 	if(rx_rst) begin
 		phs_acc_reg <= 33'b0;
@@ -90,6 +102,10 @@ always @(posedge rx_clk) begin
 end
 
 // 调用ROM IP Core 
+<<<<<<< HEAD
 BOC_PRN_ROM BOC_PRN(	.A(phs_index),	.SPO(tx_loc_prn));
+=======
+BOC_PRN_ROM BOC_PRN(	.A(phs_acc_reg[31:18]),	.SPO(tx_loc_prn));
+>>>>>>> origin/master
 
 endmodule
