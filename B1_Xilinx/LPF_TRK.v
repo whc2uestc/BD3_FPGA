@@ -20,13 +20,37 @@ output[63:0] pll_reg1;
 output[63:0] dll_reg;
 output[63:0] dll_reg_delay;
 
-wire[63:0] dll_reg;
-wire[63:0] pll_reg0;
-wire[63:0] pll_reg1;
 
-assign dll_reg  = {{41{rx_dll_disc[31]}},rx_dll_disc[31:9]} + dll_reg_delay;
-assign pll_reg0 = {{27{rx_pll_disc[31]}},rx_pll_disc,5'b0} + pll_reg0_delay;
-assign pll_reg1 = {{11{pll_reg0[63]}},pll_reg0[63:11]} + {{11{pll_reg0_delay[63]}},pll_reg0_delay[63:11]} + {{31{rx_pll_disc[31]}},rx_pll_disc,1'b0} + pll_reg1_delay;
+reg prn_sop_delay;
+always @(posedge rx_clk) begin
+	if(rx_rst)
+		prn_sop_delay <= 1'b0;
+	else
+		prn_sop_delay <= rx_prn_sop;
+end
+
+reg[63:0] dll_reg;
+reg[63:0] pll_reg0;
+reg[63:0] pll_reg1;
+always @(posedge rx_clk) begin
+	if(rx_rst) begin
+		dll_reg <= 64'b0;
+		pll_reg0 <= 64'b0;
+		pll_reg1 <= 64'b0;
+	end
+	else if(rx_prn_sop)begin
+		dll_reg  <= {{41{rx_dll_disc[31]}},rx_dll_disc[31:9]} + dll_reg_delay;
+		pll_reg0 <= {{27{rx_pll_disc[31]}},rx_pll_disc,5'b0} + pll_reg0_delay;
+		pll_reg1 <= {{11{pll_reg0[63]}},pll_reg0[63:11]} + {{11{pll_reg0_delay[63]}},pll_reg0_delay[63:11]} + {{31{rx_pll_disc[31]}},rx_pll_disc,1'b0} + pll_reg1_delay;
+	end
+end
+
+//wire[63:0] dll_reg;
+//wire[63:0] pll_reg0;
+//wire[63:0] pll_reg1;
+//assign dll_reg  = {{41{rx_dll_disc[31]}},rx_dll_disc[31:9]} + dll_reg_delay;
+//assign pll_reg0 = {{27{rx_pll_disc[31]}},rx_pll_disc,5'b0} + pll_reg0_delay;
+//assign pll_reg1 = {{11{pll_reg0[63]}},pll_reg0[63:11]} + {{11{pll_reg0_delay[63]}},pll_reg0_delay[63:11]} + {{31{rx_pll_disc[31]}},rx_pll_disc,1'b0} + pll_reg1_delay;
 reg[63:0] dll_reg_delay;
 reg[63:0] pll_reg0_delay;
 reg[63:0] pll_reg1_delay;
@@ -43,11 +67,12 @@ always @(posedge rx_clk) begin
 		pll_out <= 64'b0;
 	end
 	else begin
-		if(rx_prn_sop) begin
+		if(prn_sop_delay) begin
 			dll_out <= {{1{dll_reg[63]}},dll_reg[63:1]} + {{1{dll_reg_delay[63]}},dll_reg_delay[63:1]} + {{31{rx_dll_disc[31]}},rx_dll_disc,1'b0};
 			pll_out <= {{2{pll_reg1[63]}},pll_reg1[63:2]} + {{2{pll_reg1_delay[63]}},pll_reg1_delay[63:2]} + {{24{rx_pll_disc[31]}},rx_pll_disc,8'b0};
 			pll_reg0_delay <= pll_reg0;
 			pll_reg1_delay <= pll_reg1;
+			dll_reg_delay <= dll_reg;
 		end
 	end
 end
