@@ -13,8 +13,8 @@ output[31:0] tx_x;
 //assign tx_y=(rx_y[31])?(rx_y+(rx_x>>>shift)):(rx_y-(rx_x>>>shift));
 //assign tx_z=(rx_y[31])?(rx_z-(para>>shift)):(rx_z+(para>>shift));
 
-reg[31:0] tx_y,tx_x;
-reg[16:0] tx_z;
+(*keep="yes"*) reg[31:0] tx_y,tx_x;
+(*keep="yes"*) reg[16:0] tx_z;
 always @(posedge rx_clk) begin
 	if(rx_rst) begin
 		tx_x <= 31'b0;
