@@ -8,8 +8,8 @@ output[11:0] tx_z;
 //assign tx_x=(rx_y[15]^rx_x[15])?(rx_x-(rx_y>>>shift)):(rx_x+(rx_y>>>shift));
 //assign tx_y=(rx_y[15]^rx_x[15])?(rx_y+(rx_x>>>shift)):(rx_y-(rx_x>>>shift));
 //assign tx_z=(rx_y[15]^rx_x[15])?(rx_z-para):(rx_z+para);
-reg[31:0] tx_x,tx_y;
-reg[11:0] tx_z;
+(*keep="yes"*) reg[31:0] tx_x,tx_y;
+(*keep="yes"*) reg[11:0] tx_z;
 
 
 always @(posedge rx_clk) begin
